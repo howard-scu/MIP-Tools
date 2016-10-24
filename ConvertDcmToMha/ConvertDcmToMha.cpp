@@ -1,17 +1,25 @@
+/*
+  Copyright (c) 2016, Lu Xiaohua
+  All rights reserved.
+*/
+
+#ifndef CONVERT_DCM_TO_MHA_CPP
+#define CONVERT_DCM_TO_MHA_CPP
+
+#include "cmdline.h"
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 #include <vtkDICOMImageReader.h>
 #include <itkVTKImageToImageFilter.h>
-#include "itkImageFileWriter.h"
-#include "cmdline.h"
-using namespace std;
+#include <itkImageFileWriter.h>
+
 
 typedef itk::Image< unsigned short, 3 >		ImageType;
 
 void ConvertDcmToMha(const char* path, const char* filename)
 {
 	// use vtk to read dicom
-	vtkSmartPointer<vtkDICOMImageReader> reader =
+    vtkSmartPointer<vtkDICOMImageReader> reader =
 		vtkSmartPointer<vtkDICOMImageReader>::New();
 	reader->SetDirectoryName(path);
 	reader->Update();
@@ -40,7 +48,7 @@ void ConvertDcmToMha(const char* path, const char* filename)
 }
 
 
-int main(int argc,char* argv[])
+int main(int argc, char* argv[])
 {
 	cmdline::parser a;
 	a.add<string>("path", 'p', "dicom path");
@@ -51,3 +59,4 @@ int main(int argc,char* argv[])
 		a.get<string>("filename").c_str());			/* mha file name(.mha)*/
 }
 
+#endif  // CONVERT_DCM_TO_MHA_CPP
