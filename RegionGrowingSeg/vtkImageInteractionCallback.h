@@ -62,11 +62,11 @@ std::string Pick(vtkImageViewer2 *viewer, vtkPropPicker* picker, int *index = NU
 	picker->Pick(interactor->GetEventPosition()[0],
 		interactor->GetEventPosition()[1],
 		0.0, renderer);
-
 	// There could be other props assigned to this picker, so 
 	// make sure we picked the image actor
 	vtkAssemblyPath* path = picker->GetPath();
 	bool validPick = false;
+	//cout << interactor->GetEventPosition()[0] << "\t" << interactor->GetEventPosition()[1] << endl;
 
 	if (path)
 	{
@@ -87,7 +87,6 @@ std::string Pick(vtkImageViewer2 *viewer, vtkPropPicker* picker, int *index = NU
 	{
 		//·µ»ØOFF IMAGE
 		message = "Off Image";
-		//this->Annotation->SetText(0, "Off Image");
 		interactor->Render();
 		//style->OnMouseMove();
 		return message;
@@ -206,6 +205,10 @@ public:
 					DoSegmentation(Cmd->get<string>("input").c_str(), Cmd->get<string>("output").c_str(), KeysIndex, Cmd->get<int>("lower"), Cmd->get<int>("upper"));
 					cout << "end Segmentation" << endl;
 				}
+				if (key == "r" || key == "R")
+				{
+
+				}
 				break;
 			}
 			case(vtkCommand::MouseMoveEvent):
@@ -227,6 +230,7 @@ public:
 				Annotation->SetText(0, msg.c_str());
 				break;
 			}
+
 		}
 	}
 

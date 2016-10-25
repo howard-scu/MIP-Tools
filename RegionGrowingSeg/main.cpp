@@ -32,8 +32,9 @@
 #include <vtkPointHandleRepresentation2D.h>
 #include <vtkProperty2D.h>
 #include "vtkImageInteractionCallback.h"
-#include "vtkSeedCallback .h"
+//#include "vtkSeedCallback .h"
 #include "vtkUserInteractorStyleImage.h"
+#include "vtkRegionSelectionWidget.h"
 
 #include "cmdline.h"
 #include <Winbase.h>
@@ -118,13 +119,22 @@ void main(int argc, char* argv[])
 	myInteractorStyle->AddObserver(vtkCommand::LeftButtonPressEvent, callback);
 	renderWindowInteractor->SetInteractorStyle(myInteractorStyle);
 
+	vtkSmartPointer<vtkRegionSelectionWidget> regionSelectionWidget =
+		vtkSmartPointer<vtkRegionSelectionWidget>::New();
+	regionSelectionWidget->SetInteractor(renderWindowInteractor);
+	regionSelectionWidget->CreateDefaultRepresentation();
+	regionSelectionWidget->SelectableOff();
+	regionSelectionWidget->SetViewer(imageViewer);
+
 	imageViewer->SetColorLevel(cmd.get<int>("level"));
 	imageViewer->SetColorWindow(cmd.get<int>("window"));
 	imageViewer->SetupInteractor(renderWindowInteractor);
 	imageViewer->GetRenderWindow()->SetSize(800, 600);
-	imageViewer->Render();
 	imageViewer->GetRenderer()->ResetCamera();
 	renderWindowInteractor->Initialize();
+
+	regionSelectionWidget->On();
+	imageViewer->Render();
 	renderWindowInteractor->Start();
 
 }

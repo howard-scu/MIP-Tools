@@ -97,4 +97,9 @@ bool DoSegmentation(const char* input_fn, const char* output_fn,
 	}
 	return true;
 }
+
+
+
+
+
 #endif  // IMAGE_PROCESSING_FUNC_H
