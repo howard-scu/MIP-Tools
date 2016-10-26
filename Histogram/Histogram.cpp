@@ -46,27 +46,26 @@ void histogram(const char* filename, int bins)
 	ImageToHistogramFilterType::HistogramType* histogram = imageToHistogramFilter->GetOutput();
 
 	int top_count = 0;
+	char buf[255];
+
 	for (unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
 	{
 		if (
-			((i == 0) && (histogram->GetFrequency(i) > histogram->GetFrequency(i + 1)))		// first bin
-			|| ((i == histogram->GetSize()[0] - 1) &&
-				(histogram->GetFrequency(i) > histogram->GetFrequency(i - 1)))				// last  bin
-			|| ((histogram->GetFrequency(i) > histogram->GetFrequency(i - 1)) &&
-				(histogram->GetFrequency(i) > histogram->GetFrequency(i + 1)))				// bins in the middle
+			((i == 0) && (histogram->GetFrequency(i) > histogram->GetFrequency(i + 1)))
+			|| ((i == histogram->GetSize()[0] - 1) && (histogram->GetFrequency(i) > histogram->GetFrequency(i - 1)))
+			|| ((histogram->GetFrequency(i) > histogram->GetFrequency(i - 1)) && (histogram->GetFrequency(i) > histogram->GetFrequency(i + 1)))
 			)
 		{
 			top_count++;
-			std::cout << "[ " << histogram->GetBinMin(0, i)
-			<< "," << histogram->GetBinMax(0, i) << " ] : "
-			<< histogram->GetFrequency(i) << "\t\t<=== top "
-			<< top_count << std::endl;
+			sprintf(buf,"[%7.2f, %7.2f] : %6d\t\t<== top %d", histogram->GetBinMin(0, i), histogram->GetBinMax(0, i),
+				histogram->GetFrequency(i), top_count);
+			std::cout << buf << std::endl;
 		}
 		else
 		{
-			std::cout << "[ " << histogram->GetBinMin(0, i)
-			<< "," << histogram->GetBinMax(0, i) << " ] : "
-			<< histogram->GetFrequency(i) << std::endl;
+			sprintf(buf, "[%7.2f, %7.2f] : %6d", histogram->GetBinMin(0, i), histogram->GetBinMax(0, i),
+				histogram->GetFrequency(i));
+			std::cout << buf << std::endl;
 		}
 	}
 }
