@@ -17,4 +17,8 @@ Tiny Tools for medical image processing.
 - Print grayscale histogram
 - Find the peaks
 
+### itkRetinexDemo
+- itk version of retinex algorithm
+
+
 ...
