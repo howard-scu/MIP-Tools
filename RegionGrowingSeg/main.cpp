@@ -32,22 +32,25 @@
 #include <vtkPointHandleRepresentation2D.h>
 #include <vtkProperty2D.h>
 #include "vtkImageInteractionCallback.h"
-//#include "vtkSeedCallback .h"
 #include "vtkUserInteractorStyleImage.h"
 #include "vtkRegionSelectionWidget.h"
+#include <vtkSphereSource.h>
+
 
 #include "cmdline.h"
 #include <Winbase.h>
 
+//--input = out1.g.mha --output = out1.gs.mha --upper = 1100 --lower = 950 --window = 1500 --level = 1000
+//usage: LiverSegDemo.exe --input=out1.g.mha --output=out1.gs.mha --upper=1100 --lower=950 --window=1500 --level=1000
 void main(int argc, char* argv[])
 {
 	cmdline::parser cmd;
-	cmd.add<string>("input", 'f', "input filename",true);
-	cmd.add<string>("output", 'o', "output filename",true);
-	cmd.add<int>("upper", 'u', "upper threshold",true);
-	cmd.add<int>("lower", 'l', "lower threshold",true);
-	cmd.add<int>("window", 'w', "display window width",1500);
-	cmd.add<int>("level", 'c', "display window level",3000);
+	cmd.add<string>("input", 'f', "input filename", true);
+	cmd.add<string>("output", 'o', "output filename", true);
+	cmd.add<int>("upper", 'u', "upper threshold", true);
+	cmd.add<int>("lower", 'l', "lower threshold", true);
+	cmd.add<int>("window", 'w', "display window width", 1500);
+	cmd.add<int>("level", 'c', "display window level", 3000);
 	cmd.parse_check(argc, argv);
 
 	// ¶ÁÈ¡Í¼Ïñ
@@ -104,6 +107,16 @@ void main(int argc, char* argv[])
 	callback->SetCmdParser(&cmd);
 
 	imageViewer->GetRenderer()->AddViewProp(cornerAnnotation);
+	imageViewer->GetRenderWindow()->SetNumberOfLayers(2);
+	imageViewer->GetRenderer()->SetViewport(0, 0, 1, 1);
+
+
+	vtkSmartPointer<vtkRenderer> renderer =
+		vtkSmartPointer<vtkRenderer>::New();
+	renderer->SetViewport(0, 0, 1, 0.3);
+	renderer->SetLayer(1);
+	imageViewer->GetRenderWindow()->AddRenderer(renderer);
+
 
 	vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
 		vtkSmartPointer<vtkRenderWindowInteractor>::New();
@@ -125,11 +138,12 @@ void main(int argc, char* argv[])
 	regionSelectionWidget->CreateDefaultRepresentation();
 	regionSelectionWidget->SelectableOff();
 	regionSelectionWidget->SetViewer(imageViewer);
+	regionSelectionWidget->SetRenderer(renderer);
 
 	imageViewer->SetColorLevel(cmd.get<int>("level"));
 	imageViewer->SetColorWindow(cmd.get<int>("window"));
 	imageViewer->SetupInteractor(renderWindowInteractor);
-	imageViewer->GetRenderWindow()->SetSize(800, 600);
+	imageViewer->GetRenderWindow()->SetSize(800, 800);
 	imageViewer->GetRenderer()->ResetCamera();
 	renderWindowInteractor->Initialize();
 
@@ -138,3 +152,86 @@ void main(int argc, char* argv[])
 	renderWindowInteractor->Start();
 
 }
+
+
+
+//#include "itkBinaryThresholdImageFilter.h"
+//#include "itkImageFileWriter.h"
+//#include "itkSliceBySliceImageFilter.h"
+//#include "itkConnectedComponentImageFilter.h"
+//#include "itkLabelShapeKeepNObjectsImageFilter.h"
+//
+//#include "itkMedianImageFilter.h"
+//#include "itkSubtractImageFilter.h"
+//#include "itkImageFileReader.h"
+//
+//
+//void main(int argc, char* argv[])
+//{
+//	typedef  unsigned short   PixelType;
+//	typedef itk::Image< PixelType, 3 >   Image3DType;
+//	typedef itk::Image< PixelType, 2 >   Image2DType;
+//
+//	typedef itk::ImageFileReader< Image3DType >  ReaderType;
+//	typedef itk::ImageFileWriter< Image3DType >  WriterType;
+//
+//	typedef itk::ConnectedComponentImageFilter < Image2DType, Image2DType >
+//		ConnectedComponentImageFilterType;
+//	typedef itk::LabelShapeKeepNObjectsImageFilter< Image2DType >
+//		LabelShapeKeepNObjectsImageFilterType;
+//
+//
+//	ReaderType::Pointer reader = ReaderType::New();
+//	reader->SetFileName("out1.gs.mha");
+//	try
+//	{
+//		reader->Update();
+//	}
+//	catch (itk::ExceptionObject & excep)
+//	{
+//		std::cerr << "Exception caught !" << std::endl;
+//		std::cerr << excep << std::endl;
+//	}
+//
+//	ConnectedComponentImageFilterType::Pointer connectedComponentFilter = ConnectedComponentImageFilterType::New();
+//	// connectedComponentFilter->SetInput()			//input from SliceBySliceImageFilter
+//	// connectedComponentFilter->Update();			// should not use filter update
+//
+//	LabelShapeKeepNObjectsImageFilterType::Pointer labelShapeKeepNObjectsImageFilter = LabelShapeKeepNObjectsImageFilterType::New();
+//	labelShapeKeepNObjectsImageFilter->SetInput(connectedComponentFilter->GetOutput());
+//	labelShapeKeepNObjectsImageFilter->SetBackgroundValue(0);
+//	labelShapeKeepNObjectsImageFilter->SetNumberOfObjects(1);
+//	labelShapeKeepNObjectsImageFilter->SetAttribute(LabelShapeKeepNObjectsImageFilterType::LabelObjectType::NUMBER_OF_PIXELS);
+//	// labelShapeKeepNObjectsImageFilter->Update();		// should not use filter update
+//
+//
+//
+//	typedef itk::SliceBySliceImageFilter< Image3DType, Image3DType>   SliceBySliceImageFilter;
+//	SliceBySliceImageFilter::Pointer sliceBySliceFilter = SliceBySliceImageFilter::New();
+//	sliceBySliceFilter->SetInput(reader->GetOutput());		// input
+//	sliceBySliceFilter->SetInputFilter(connectedComponentFilter);			// the first filter of the image processing pipline
+//	sliceBySliceFilter->SetOutputFilter(labelShapeKeepNObjectsImageFilter);	// the first filter of the image processing pipline
+//	//sliceBySliceFilter->SetDimension(2);		// the reslice direction
+//	try
+//	{
+//		sliceBySliceFilter->Update();
+//	}
+//	catch (itk::ExceptionObject & excep)
+//	{
+//		std::cerr << "Exception caught !" << std::endl;
+//		std::cerr << excep << std::endl;
+//	}
+//	WriterType::Pointer writer = WriterType::New();
+//	writer->SetInput(sliceBySliceFilter->GetOutput());
+//	writer->SetFileName("out1.gsxx.mha");
+//	try
+//	{
+//		writer->Update();
+//	}
+//	catch (itk::ExceptionObject & excep)
+//	{
+//		std::cerr << "Exception caught !" << std::endl;
+//		std::cerr << excep << std::endl;
+//	}
+//}
+//

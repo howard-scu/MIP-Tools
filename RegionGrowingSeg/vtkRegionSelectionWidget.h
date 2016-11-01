@@ -23,6 +23,8 @@ All rights reserved.
 #include <vtkExtractVOI.h>
 #include <vtkImageCanvasSource2D.h>
 #include <vtkImageMask.h>
+#include <vtkXYPlotActor.h>
+
 
 class vtkRegionSelectionWidget : public vtkBorderWidget
 {
@@ -35,6 +37,11 @@ public:
 		this->Viewer = viewer;
 	}
 
+	void SetRenderer(vtkRenderer *viewer)
+	{
+		this->Renderer = viewer;
+	}
+	
 	int SubclassEndSelectAction()
 	{
 		vtkImageData*  image = Viewer->GetInput();
@@ -56,19 +63,38 @@ public:
 		extractVOI->SetVOI(nlowerLeft[0], nupperRight[0], nlowerLeft[1], nupperRight[1], slice, slice);
 		extractVOI->Update();
 
-		//histogram->SetStencilData(stencil);
 		histogram->SetInputData(extractVOI->GetOutput());
-		histogram->SetComponentExtent(0, 300, 0, 0, 0, 0);
+		//histogram->SetComponentExtent(0, 300, 0, 0, 0, 0);
 		histogram->SetComponentOrigin(0, 0, 0);
-		histogram->SetComponentSpacing(10, 0, 0);
+		histogram->SetComponentSpacing(30, 0, 0);
 		histogram->IgnoreZeroOff();
-		histogram->Update(); 
-		cout << "======================================" << endl;
-		cout << "Mean: [ " << *(histogram->GetMean()) << " ]" << endl;
-		cout << "Min/Max:  [ " << *(histogram->GetMin())<<","<< *(histogram->GetMax()) << " ]" << endl;
+		histogram->Update();
+		cout << "========================" << endl;
+		cout << "  Area:  [ " << histogram->GetVoxelCount()*spacing[0] * spacing[1] << " ]" << endl;
+		cout << "  Mean:  [ " << *(histogram->GetMean()) << " ]" << endl;
+		cout << "Min/Max: [ " << *(histogram->GetMin()) << ", " << *(histogram->GetMax()) << " ]" << endl;
 		cout << "Std.Dev: [ " << *(histogram->GetStandardDeviation()) << " ]" << endl;
-		cout << "Area: [ " << histogram->GetVoxelCount()*spacing[0]*spacing[1] << " ]" << endl;
-		cout << "======================================" << endl;
+		cout << "========================" << endl;
+
+		vtkSmartPointer<vtkXYPlotActor> plot =
+			vtkSmartPointer<vtkXYPlotActor>::New();
+		plot->ExchangeAxesOff();
+		plot->SetLabelFormat("%g");
+		//plot->SetXTitle("Level");
+		//plot->SetYTitle("Frequency");
+		plot->SetXValuesToValue();
+
+
+		plot->AddDataSetInputConnection(histogram->GetOutputPort());
+		plot->SetPlotColor(0, 1, 1, 1);
+		plot->LegendOn();
+
+		plot->SetXRange(0, extractVOI->GetOutput()->GetScalarRange()[1]);
+		plot->SetYRange(0, histogram->GetOutput()->GetScalarRange()[1]);
+
+		Renderer->RemoveAllViewProps();
+		Renderer->AddActor(plot);
+		Viewer->Render();
 
 		return vtkBorderWidget::SubclassSelectAction(); // works
 	}
@@ -81,9 +107,10 @@ public:
 		histogram = vtkSmartPointer<vtkImageAccumulate>::New();
 		extractVOI = vtkSmartPointer<vtkExtractVOI>::New();
 	}
-	vtkImageViewer2*      Viewer; 
+	vtkImageViewer2*      Viewer;
 	vtkSmartPointer<vtkImageAccumulate> histogram;
 	vtkSmartPointer<vtkExtractVOI> extractVOI;
+	vtkRenderer*      Renderer;
 };
 
 vtkStandardNewMacro(vtkRegionSelectionWidget);

@@ -6,13 +6,12 @@
 #ifndef IMAGE_PROCESSING_FUNC_H
 #define IMAGE_PROCESSING_FUNC_H
 
-#include "itkConnectedThresholdImageFilter.h"
+#include "itkRegionGrowingImageFilter.h"
 #include "itkImage.h"
 #include "itkCastImageFilter.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include <vector>
-
 
 // 功能：	区域生长分割
 // 输入：	@input_fn		输入图像文件名
@@ -57,11 +56,11 @@ bool DoSegmentation(const char* input_fn, const char* output_fn,
 		std::cerr << excep << std::endl;
 		return false;
 	}
+	
+	typedef itk::RegionGrowingImageFilter< InternalImageType,
+		InternalImageType > RegionGrowImageFilterType;
 
-	typedef itk::ConnectedThresholdImageFilter< InternalImageType,
-		InternalImageType > ConnectedFilterType;
-
-	ConnectedFilterType::Pointer connectedThreshold = ConnectedFilterType::New();
+	RegionGrowImageFilterType::Pointer connectedThreshold = RegionGrowImageFilterType::New();
 	connectedThreshold->SetInput(reader->GetOutput());
 	caster->SetInput(connectedThreshold->GetOutput());
 	writer->SetInput(caster->GetOutput());
