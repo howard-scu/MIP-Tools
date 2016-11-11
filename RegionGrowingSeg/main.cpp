@@ -53,27 +53,27 @@ void main(int argc, char* argv[])
 	cmd.add<int>("level", 'c', "display window level", 3000);
 	cmd.parse_check(argc, argv);
 
-	// ¶ÁÈ¡Í¼Ïñ
+	// è¯»å–å›¾åƒ
 	vtkSmartPointer<vtkMetaImageReader> reader =
 		vtkSmartPointer<vtkMetaImageReader>::New();
 	reader->SetFileName(cmd.get<string>("input").c_str());
 	reader->Update();
 
-	// ¿ÉÊÓ»¯
+	// å¯è§†åŒ–
 	vtkSmartPointer<vtkImageViewer2> imageViewer =
 		vtkSmartPointer<vtkImageViewer2>::New();
 	imageViewer->SetInputConnection(reader->GetOutputPort());
 
-	// Ê°È¡Æ÷
+	// æ‹¾å–å™¨
 	vtkSmartPointer<vtkPropPicker> propPicker =
 		vtkSmartPointer<vtkPropPicker>::New();
 	propPicker->PickFromListOn();
 
-	// ÉèÖÃÊ°È¡¶ÔÏó
+	// è®¾ç½®æ‹¾å–å¯¹è±¡
 	vtkImageActor* imageActor = imageViewer->GetImageActor();
 	propPicker->AddPickList(imageActor);
 
-	// ²»Ê¹ÓÃ²åÖµ¼ÆËã£¬»ñÈ¡ÌåËØÊıÖµ
+	// ä¸ä½¿ç”¨æ’å€¼è®¡ç®—ï¼Œè·å–ä½“ç´ æ•°å€¼
 	imageActor->InterpolateOff();
 
 	vtkSmartPointer<vtkImageInteractionCallback> callback =
@@ -81,7 +81,7 @@ void main(int argc, char* argv[])
 	callback->SetViewer(imageViewer);
 	callback->SetPicker(propPicker);
 
-	// ÉèÖÃannotation
+	// è®¾ç½®annotation
 	//	---------
 	//	|2	   3|
 	//	|0	   1|
@@ -152,86 +152,3 @@ void main(int argc, char* argv[])
 	renderWindowInteractor->Start();
 
 }
-
-
-
-//#include "itkBinaryThresholdImageFilter.h"
-//#include "itkImageFileWriter.h"
-//#include "itkSliceBySliceImageFilter.h"
-//#include "itkConnectedComponentImageFilter.h"
-//#include "itkLabelShapeKeepNObjectsImageFilter.h"
-//
-//#include "itkMedianImageFilter.h"
-//#include "itkSubtractImageFilter.h"
-//#include "itkImageFileReader.h"
-//
-//
-//void main(int argc, char* argv[])
-//{
-//	typedef  unsigned short   PixelType;
-//	typedef itk::Image< PixelType, 3 >   Image3DType;
-//	typedef itk::Image< PixelType, 2 >   Image2DType;
-//
-//	typedef itk::ImageFileReader< Image3DType >  ReaderType;
-//	typedef itk::ImageFileWriter< Image3DType >  WriterType;
-//
-//	typedef itk::ConnectedComponentImageFilter < Image2DType, Image2DType >
-//		ConnectedComponentImageFilterType;
-//	typedef itk::LabelShapeKeepNObjectsImageFilter< Image2DType >
-//		LabelShapeKeepNObjectsImageFilterType;
-//
-//
-//	ReaderType::Pointer reader = ReaderType::New();
-//	reader->SetFileName("out1.gs.mha");
-//	try
-//	{
-//		reader->Update();
-//	}
-//	catch (itk::ExceptionObject & excep)
-//	{
-//		std::cerr << "Exception caught !" << std::endl;
-//		std::cerr << excep << std::endl;
-//	}
-//
-//	ConnectedComponentImageFilterType::Pointer connectedComponentFilter = ConnectedComponentImageFilterType::New();
-//	// connectedComponentFilter->SetInput()			//input from SliceBySliceImageFilter
-//	// connectedComponentFilter->Update();			// should not use filter update
-//
-//	LabelShapeKeepNObjectsImageFilterType::Pointer labelShapeKeepNObjectsImageFilter = LabelShapeKeepNObjectsImageFilterType::New();
-//	labelShapeKeepNObjectsImageFilter->SetInput(connectedComponentFilter->GetOutput());
-//	labelShapeKeepNObjectsImageFilter->SetBackgroundValue(0);
-//	labelShapeKeepNObjectsImageFilter->SetNumberOfObjects(1);
-//	labelShapeKeepNObjectsImageFilter->SetAttribute(LabelShapeKeepNObjectsImageFilterType::LabelObjectType::NUMBER_OF_PIXELS);
-//	// labelShapeKeepNObjectsImageFilter->Update();		// should not use filter update
-//
-//
-//
-//	typedef itk::SliceBySliceImageFilter< Image3DType, Image3DType>   SliceBySliceImageFilter;
-//	SliceBySliceImageFilter::Pointer sliceBySliceFilter = SliceBySliceImageFilter::New();
-//	sliceBySliceFilter->SetInput(reader->GetOutput());		// input
-//	sliceBySliceFilter->SetInputFilter(connectedComponentFilter);			// the first filter of the image processing pipline
-//	sliceBySliceFilter->SetOutputFilter(labelShapeKeepNObjectsImageFilter);	// the first filter of the image processing pipline
-//	//sliceBySliceFilter->SetDimension(2);		// the reslice direction
-//	try
-//	{
-//		sliceBySliceFilter->Update();
-//	}
-//	catch (itk::ExceptionObject & excep)
-//	{
-//		std::cerr << "Exception caught !" << std::endl;
-//		std::cerr << excep << std::endl;
-//	}
-//	WriterType::Pointer writer = WriterType::New();
-//	writer->SetInput(sliceBySliceFilter->GetOutput());
-//	writer->SetFileName("out1.gsxx.mha");
-//	try
-//	{
-//		writer->Update();
-//	}
-//	catch (itk::ExceptionObject & excep)
-//	{
-//		std::cerr << "Exception caught !" << std::endl;
-//		std::cerr << excep << std::endl;
-//	}
-//}
-//
