@@ -30,12 +30,12 @@ TpsRegistration::TpsRegistration()
 
 void TpsRegistration::AddFixContour(std::vector<ImageType::IndexType> &point_list)
 {
-
+	m_FixVec.push_back(point_list);
 }
 
 void TpsRegistration::AddMovContour(std::vector<ImageType::IndexType> &point_list)
 {
-
+	m_MovVec.push_back(point_list);
 }
 
 void TpsRegistration::SetFixImage(ImageType::Pointer image)
@@ -360,6 +360,23 @@ std::vector<std::pair< Point2D, Point2D> > TpsRegistration::FindPairs(ImageType:
 		}
 	}
 
+	return pointPairs;
+}
+
+std::vector<std::pair< Point2D, Point2D> > TpsRegistration::FindPairs(std::vector<std::vector<ImageType::IndexType> >& fixVec,
+	std::vector<std::vector<ImageType::IndexType> >& movVec)
+{
+	std::vector<std::pair< Point2D, Point2D> > pointPairs;
+	std::vector<std::vector<ImageType::IndexType> >::iterator it1 = fixVec.begin();
+	std::vector<std::vector<ImageType::IndexType> >::iterator it2 = movVec.begin();
+
+	for (it1, it2; it1 != fixVec.end() && it2 != movVec.end(); it1++, it2++)
+	{
+		Point2D pt1 = CalcCenter(*it1);
+		Point2D pt2 = CalcCenter(*it2);
+		std::pair<Point2D, Point2D> pointPair(pt1,pt2);
+		pointPairs.push_back(pointPair);
+	}
 	return pointPairs;
 }
 

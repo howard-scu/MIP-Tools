@@ -37,6 +37,8 @@ private:
 		ImageType::Pointer image2, Point2DPtr center2);
 	std::vector<std::pair< Point2D, Point2D> >		FindPairs(std::vector<ImageType::IndexType> image1, Point2DPtr center1,
 		std::vector<ImageType::IndexType> image2, Point2DPtr center2);
+	std::vector<std::pair< Point2D, Point2D> >		FindPairs(std::vector<std::vector<ImageType::IndexType> >& fixVec,
+		std::vector<std::vector<ImageType::IndexType> >& movVec);
 	void					TpsReg(ImageType::Pointer image, std::vector<std::pair< Point2D, Point2D> > &pairs);
 	Point2D					CalcCenter(std::vector<ImageType::IndexType> point_list);
 	void SetFixLandmarks(std::vector<ImageType::IndexType> &point_list);
@@ -46,5 +48,7 @@ private:
 	ImageType::Pointer	m_ResultImage;
 	std::vector<ImageType::IndexType>	m_FixedLands;
 	std::vector<ImageType::IndexType>	m_MovingLands;
+	std::vector<std::vector<ImageType::IndexType> > m_FixVec;
+	std::vector<std::vector<ImageType::IndexType> > m_MovVec;
 };
 
