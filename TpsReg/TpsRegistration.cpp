@@ -514,6 +514,8 @@ void TpsRegistration::Update()
 	//		<< it->second.x << "," << it->second.y <<"]"<< std::endl;
 	//}
 	//TpsReg(m_MovingImage, pairs);
+	std::vector<std::pair< Point2D, Point2D> >  pairs = FindPairs(m_FixVec, m_MovVec);
+	TpsReg(m_MovingImage, pairs);
 }
 
 
